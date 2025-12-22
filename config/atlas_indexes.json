@@ -1,0 +1,114 @@
+{
+  "indexes": {
+    "entities_vector_index": {
+      "collection": "entities",
+      "name": "vector_index",
+      "type": "vectorSearch",
+      "definition": {
+        "mappings": {
+          "dynamic": true,
+          "fields": {
+            "description_embedding": {
+              "type": "knnVector",
+              "dimensions": 1024,
+              "similarity": "cosine"
+            },
+            "entity_type": {
+              "type": "token"
+            },
+            "name": {
+              "type": "string",
+              "analyzer": "lucene.standard"
+            },
+            "properties.criticality": {
+              "type": "token"
+            },
+            "properties.compliance_tags": {
+              "type": "token"
+            },
+            "properties.security_zone": {
+              "type": "token"
+            },
+            "properties.data_classification": {
+              "type": "token"
+            }
+          }
+        }
+      }
+    },
+    "firewall_rules_vector_index": {
+      "collection": "firewall_rules",
+      "name": "firewall_vector_index",
+      "type": "vectorSearch",
+      "definition": {
+        "mappings": {
+          "dynamic": true,
+          "fields": {
+            "description_embedding": {
+              "type": "knnVector",
+              "dimensions": 1024,
+              "similarity": "cosine"
+            },
+            "firewall": {
+              "type": "token"
+            },
+            "source_zone": {
+              "type": "token"
+            },
+            "destination_zone": {
+              "type": "token"
+            },
+            "action": {
+              "type": "token"
+            }
+          }
+        }
+      }
+    },
+    "relationships_index": {
+      "collection": "relationships",
+      "name": "relationships_compound_index",
+      "type": "regular",
+      "definition": {
+        "keys": {
+          "source.entity_id": 1,
+          "target.entity_id": 1,
+          "relationship_type": 1
+        }
+      }
+    },
+    "entities_search_index": {
+      "collection": "entities",
+      "name": "entities_search",
+      "type": "search",
+      "definition": {
+        "mappings": {
+          "dynamic": false,
+          "fields": {
+            "name": {
+              "type": "string",
+              "analyzer": "lucene.standard"
+            },
+            "description": {
+              "type": "string",
+              "analyzer": "lucene.standard"
+            },
+            "entity_type": {
+              "type": "stringFacet"
+            },
+            "properties.compliance_tags": {
+              "type": "string",
+              "analyzer": "lucene.keyword"
+            }
+          }
+        }
+      }
+    }
+  },
+  "instructions": {
+    "vector_search": "Create this index via Atlas UI: Database > Search > Create Search Index > JSON Editor",
+    "regular_indexes": "These are created automatically by the setup script using createIndex()",
+    "note": "Vector Search indexes must be created through Atlas UI or Atlas Admin API, not via PyMongo"
+  }
+}
+
