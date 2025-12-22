@@ -18,6 +18,16 @@ This demo showcases how to:
 
 ---
 
+## 📸 Infrastructure Topology
+
+The demo generates a complete infrastructure knowledge graph with the following components:
+
+![Infrastructure Topology](images/topology.png)
+
+*The topology shows the relationships between Firewalls, Load Balancers, Switches, VLANs, Servers, and Applications in a top-down traffic flow.*
+
+---
+
 ## 🏗️ Architecture
 
 ```
