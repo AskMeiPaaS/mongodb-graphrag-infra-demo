@@ -157,15 +157,32 @@ VECTOR_DIMENSIONS=1024
 3. Copy the connection string
 4. Replace `<password>` with your actual password in the `.env` file
 
-### Step 6: Create Vector Search Indexes
+### Step 6: Load Sample Data
 
-You need to create **2 Vector Search indexes** in MongoDB Atlas.
+```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate
 
-#### 6.1 Create Index for `entities` Collection
+# Load the sample infrastructure data
+python scripts/load_sample_data.py
+```
+
+This will:
+- Create the database and collections
+- Generate sample infrastructure entities (servers, firewalls, applications, VLANs, etc.)
+- Create relationships between entities
+- Generate vector embeddings for all entities
+- Load everything into MongoDB Atlas
+
+### Step 7: Create Vector Search Indexes
+
+After loading the sample data, you need to create **2 Vector Search indexes** in MongoDB Atlas.
+
+#### 7.1 Create Index for `entities` Collection
 
 1. In Atlas, go to your cluster → **Browse Collections**
-2. The database and collections will be created when you load sample data (Step 7)
-3. After loading data, go to **Atlas Search** → **Create Search Index**
+2. You should see the `infrastructure_graph` database with `entities`, `relationships`, and `firewall_rules` collections
+3. Go to **Atlas Search** → **Create Search Index**
 4. Select **JSON Editor** and choose the `entities` collection
 5. Set the **Index Name** to: `entities_vector_index`
 6. Paste this configuration:
@@ -193,7 +210,7 @@ You need to create **2 Vector Search indexes** in MongoDB Atlas.
 
 7. Click **Create Search Index**
 
-#### 6.2 Create Index for `firewall_rules` Collection
+#### 7.2 Create Index for `firewall_rules` Collection
 
 1. Go to **Atlas Search** → **Create Search Index**
 2. Select **JSON Editor** and choose the `firewall_rules` collection
@@ -231,43 +248,14 @@ You need to create **2 Vector Search indexes** in MongoDB Atlas.
 
 5. Click **Create Search Index**
 
-> ⏳ **Note**: Vector Search indexes may take a few minutes to build. Wait until the status shows **Active** before proceeding.
+> ⏳ **Note**: Vector Search indexes may take a few minutes to build. Wait until the status shows **Active** before proceeding to run the demo.
 
-### Step 7: Load Sample Data
-
-```bash
-# Make sure your virtual environment is activated
-source venv/bin/activate
-
-# Load the sample infrastructure data
-python scripts/load_sample_data.py
-```
-
-This will:
-- Create the database and collections
-- Generate sample infrastructure entities (servers, firewalls, applications, VLANs, etc.)
-- Create relationships between entities
-- Generate vector embeddings for all entities
-- Load everything into MongoDB Atlas
-
-**Expected Output:**
-```
-Connecting to MongoDB Atlas...
-Connected successfully!
-Loading entities...
-Loaded 30 entities
-Loading relationships...
-Loaded 85 relationships
-Loading firewall rules...
-Loaded 45 firewall rules
-Sample data loaded successfully!
-```
 
 ---
 
 ## ▶️ Running the Demo
 
-### Option 1: Streamlit Web UI (Recommended)
+### Streamlit Web UI
 
 ```bash
 source venv/bin/activate
@@ -278,15 +266,6 @@ This opens a web interface at `http://localhost:8501` with:
 - **💬 Chat**: Ask natural language questions about infrastructure
 - **🗺️ Topology**: Visual graph of all infrastructure components
 - **⚡ Impact Analysis**: Analyze impact of component failures
-- **📋 Compliance**: View PCI-DSS, SOX, GLBA compliance scope
-- **🔥 Firewall Rules**: Explore firewall rules between zones
-
-### Option 2: Command Line Demo
-
-```bash
-source venv/bin/activate
-python demo/demo_queries.py
-```
 
 ---
 
@@ -382,64 +361,3 @@ When you ask a question:
 | "Impact of SRV-DB-003 maintenance" | Maintenance impact assessment |
 
 ---
-
-## 🛠️ Troubleshooting
-
-### "ModuleNotFoundError: No module named 'xxx'"
-```bash
-# Make sure virtual environment is activated
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### "Connection refused" or MongoDB errors
-- Check your `MONGODB_URI` in `.env`
-- Verify your IP is whitelisted in Atlas Network Access
-- Ensure username/password are correct
-
-### "Vector search index not found"
-- Go to Atlas → Browse Collections → Atlas Search
-- Verify indexes are created and status is **Active**
-- Index names must match: `entities_vector_index` and `firewall_rules_vector_index`
-
-### "API key invalid" errors
-- Verify your `VOYAGE_API_KEY` and `ANTHROPIC_API_KEY` in `.env`
-- Check that API keys have not expired
-
-### Streamlit not loading
-```bash
-# Make sure you're in the project directory with venv activated
-cd mongodb-graphrag-infra-demo
-source venv/bin/activate
-python -m streamlit run demo/streamlit_app.py
-```
-
----
-
-## 🏦 Why MongoDB for Infrastructure GraphRAG?
-
-| Feature | Benefit |
-|---------|---------|
-| **Flexible Schema** | Handle diverse infrastructure types (firewalls ≠ servers ≠ cloud resources) |
-| **Native Graph Queries** | `$graphLookup` for multi-hop traversals without external graph DB |
-| **Vector Search** | Semantic similarity built into Atlas - no separate vector database needed |
-| **Enterprise Security** | Encryption, VPC peering, compliance (SOC2, PCI-DSS, HIPAA) |
-| **Operational Simplicity** | Single platform vs. managing separate graph + vector + document DBs |
-
----
-
-## 📝 License
-
-MIT License - feel free to use this demo for learning and development.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📧 Questions?
-
-If you have questions about this demo, please open an issue in the repository.
