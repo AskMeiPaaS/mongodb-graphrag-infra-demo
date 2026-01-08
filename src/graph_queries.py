@@ -24,7 +24,7 @@ def vector_search_entities(
     pipeline = [
         {
             "$vectorSearch": {
-                "index": "vector_index",
+                "index": "entities_vector_index",
                 "path": "description_embedding",
                 "queryVector": query_embedding,
                 "numCandidates": limit * 20,
@@ -444,7 +444,7 @@ def search_entities_hybrid(
     pipeline = [
         {
             "$vectorSearch": {
-                "index": "vector_index",
+                "index": "entities_vector_index",
                 "path": "description_embedding",
                 "queryVector": query_embedding,
                 "numCandidates": limit * 20,

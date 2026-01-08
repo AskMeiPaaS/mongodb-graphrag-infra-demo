@@ -208,7 +208,7 @@ class InfrastructureGraphRAGRetriever(BaseRetriever):
         pipeline = [
             {
                 "$vectorSearch": {
-                    "index": "firewall_vector_index",
+                    "index": "firewall_rules_vector_index",
                     "path": "description_embedding",
                     "queryVector": query_embedding,
                     "numCandidates": 50,
