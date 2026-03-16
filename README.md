@@ -8,7 +8,7 @@ This demo showcases how to:
 - Build a **knowledge graph** of infrastructure entities (servers, firewalls, applications, VLANs, etc.)
 - Use **MongoDB Atlas Vector Search** for semantic similarity queries
 - Leverage **$graphLookup** for multi-hop graph traversals
-- Combine graph context with **LLM (Claude)** to answer natural language questions about infrastructure
+- Combine graph context with **LLM (Claude/OpenAI)** to answer natural language questions about infrastructure
 
 **Example Questions You Can Ask:**
 - "What would happen if FW-PROD-01 fails?"
@@ -44,7 +44,7 @@ The demo generates a complete infrastructure knowledge graph with the following 
 │  2. Vector search for relevant entities                          │
 │  3. Graph traversal via $graphLookup                             │
 │  4. Construct enriched context                                   │
-│  5. LLM generates contextual response (Claude)                   │
+│  5. LLM generates contextual response (GPT-4o or Claude)         │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -75,6 +75,7 @@ Before starting, ensure you have:
 | **MongoDB Atlas Cluster** | M10+ tier (for Vector Search) | [MongoDB Atlas](https://www.mongodb.com/atlas) |
 | **VoyageAI API Key** | For generating embeddings | [VoyageAI](https://www.voyageai.com/) |
 | **Anthropic API Key** | For Claude LLM responses | [Anthropic Console](https://console.anthropic.com/) |
+| **OpenAI API Key** | For GPT-4o LLM responses | [OpenAI Platform](https://platform.openai.com/) |
 
 ---
 
@@ -91,11 +92,13 @@ cd mongodb-graphrag-infra-demo
 
 ```bash
 # Create virtual environment
-python -m venv venv
+# If you have 3.12 installed
+python3.12 -m venv graphrag
+#python -m venv graphrag
 
 # Activate it
 # On macOS/Linux:
-source venv/bin/activate
+source graphrag/bin/activate
 
 # On Windows:
 venv\Scripts\activate
@@ -125,9 +128,16 @@ MONGODB_DATABASE=infrastructure_graph
 VOYAGE_API_KEY=your_voyageai_api_key_here
 VOYAGE_EMBEDDING_MODEL=voyage-2
 
+# LLM Configuration
+LLM_PROVIDER=openai  # Options: openai, anthropic
+
+# OpenAI (for LLM)
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4o
+
 # Anthropic (for LLM)
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
-ANTHROPIC_MODEL=claude-sonnet-4-20250514
+ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
 
 # Vector dimensions (VoyageAI voyage-2 uses 1024)
 VECTOR_DIMENSIONS=1024
@@ -289,7 +299,7 @@ mongodb-graphrag-infra-demo/
 │   ├── embeddings.py              # VoyageAI embedding generation
 │   ├── graph_queries.py           # MongoDB graph traversal queries
 │   ├── graphrag_retriever.py      # Custom LangChain retriever
-│   └── graphrag_chain.py          # Main GraphRAG chain with Claude
+│   └── graphrag_chain.py          # Main GraphRAG chain with support for GPT-4o & Claude
 │
 ├── scripts/
 │   ├── setup_database.py          # Initialize database & indexes
@@ -339,7 +349,7 @@ When you ask a question:
 2. **Vector Search**: MongoDB finds semantically similar entities
 3. **Graph Traversal**: `$graphLookup` finds related entities (upstream/downstream)
 4. **Context Assembly**: All relevant information is compiled
-5. **LLM Response**: Claude generates a natural language answer
+5. **LLM Response**: GPT-4o or Claude generates a natural language answer
 
 ### 3. Key MongoDB Features Used
 

@@ -7,6 +7,7 @@ from typing import Dict, Any, Optional
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
 from .database import get_db
@@ -118,12 +119,21 @@ def create_graphrag_chain(
     # Select prompt
     prompt = IMPACT_ANALYSIS_PROMPT if prompt_type == "impact" else INFRASTRUCTURE_PROMPT
     
-    # Create LLM
-    llm = ChatAnthropic(
-        model_name=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
-        temperature=0,
-        anthropic_api_key=os.getenv("ANTHROPIC_API_KEY")
-    )
+    # Create LLM based on provider
+    llm_provider = os.getenv("LLM_PROVIDER", "openai").lower()
+    
+    if llm_provider == "anthropic":
+        llm = ChatAnthropic(
+            model_name=os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620"),
+            temperature=0,
+            anthropic_api_key=os.getenv("ANTHROPIC_API_KEY")
+        )
+    else:  # Default to OpenAI
+        llm = ChatOpenAI(
+            model_name=os.getenv("OPENAI_MODEL", "gpt-4o"),
+            temperature=0,
+            openai_api_key=os.getenv("OPENAI_API_KEY")
+        )
     
     # Create chain
     chain = RetrievalQA.from_chain_type(
